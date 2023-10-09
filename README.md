@@ -30,7 +30,7 @@ ReactDOM is a package in React that provides the necessary methods to interact w
 - They are particularly useful when you want to return multiple adjacent elements from a component's render method without wrapping them in a single container.
 - React Fragments can be created using the <React.Fragment> syntax, for example:
 
-```html
+```javascript
 <React.Fragment>
   <h1>Hello World</hi>
   <p>React is awesome! </p>
@@ -39,7 +39,7 @@ ReactDOM is a package in React that provides the necessary methods to interact w
 
 - React Fragments can also be created using an empty angle bracket syntax `<>...</>`, which is a shorter and more concise way to define fragments, for example:
 
-```html
+```javascript
 <>
   <h4>Hello World</h1>
   <p>React is Awesome! </p>
@@ -51,7 +51,7 @@ ReactDOM is a package in React that provides the necessary methods to interact w
 - Conditional rendering refers to the process of displaying different elements or components in your React application based on specific conditions or criteria.
 - In React, conditional rendering can be achieved in various ways, but two common approaches involve using ternary operators (`? :`) or short-circuit evaluation (`&&`).
 
-```html
+```javascript
 <React.Fragment>
   { myBool ? <hi>Hello World</h1> : null }
   { myOtherBool && <p>React is Awesome!</p> }
@@ -68,13 +68,13 @@ ReactDOM is a package in React that provides the necessary methods to interact w
 - Props are read-only and cannot be modified by the component receiving them; they are intended for data that is passed from parent to child.
 - Consider an example:
 
-```html
+```javascript
 <MyComponent message-"hello” number={42} />
 ```
 
 The `MyComponent` function would take in props with two key-value pairs:
 
-```html
+```javascript
 function MyComponent(props) {
   console.log(props.message); // “hello”
   console.log(props.number); // 42
@@ -107,7 +107,7 @@ function MyComponent(props) {
   - The second element is a setter function, which we can use to update the state value.
 - We typically destructure the array returned by `useState` to assign meaningful variable names to the current state and its corresponding setter function, for example:
   
-```html
+```javascript
 const [number, setNumber] = useState(10);
 ```
 
@@ -118,7 +118,7 @@ const [number, setNumber] = useState(10);
   - The first element is the current state value.
   - The second element is a dispatch function, which is used to dispatch actions to update the state.
 
-```html
+```javascript
 const [state, dispatch] = useReducer(reducer, {
   count: 0
 });
@@ -133,7 +133,7 @@ return (
 
 - The dispatch function accepts an action object as its argument. The action object typically includes a `type` property, which is used in a switch statement inside the reducer function to determine how to update the state. For example:
 
-```html
+```javascript
 function reducer(state, action) {
   switch (action.type) {
     case 'increment':
@@ -163,7 +163,7 @@ function reducer(state, action) {
 
 - A controlled component is a React pattern where we use React state to control and manage the current state of an input element. Fro example, an input can be controlled via the `value` and `onChange` props (note that in React, `onChange` works the same as `onInput`):
   
-```html
+```javascript
 const [value, setValue] = useState("");
 return <input value={value} onChange={e => setValue(e.target.value)} />;
 ```
@@ -171,6 +171,139 @@ return <input value={value} onChange={e => setValue(e.target.value)} />;
 - In a controlled component, we explicitly set the input element's value using the `value` prop, and we provide an `onChange` event handler to update the state whenever the input value changes.
 - This pattern ensures that the React component's state and the input element's value are always in sync, and any changes to the input value are controlled by React.
 - Controlled components are useful for maintaining strict control over the input's behavior and value, making it easier to perform validation, synchronization, or other custom logic when the input changes.
+
+## React Component Lifecycle
+The React component lifecycle consists of three primary stages:
+
+1. **Mounting:**
+   - This stage occurs when a component is being created and inserted into the DOM for the first time.
+   - Key lifecycle methods during mounting include:
+     - `constructor`: The component's constructor function is called.
+     - `render`: The component's UI is rendered.
+     - `componentDidMount`: This method is called after the component has been rendered into the DOM. It's often used for performing initial setup, data fetching, or interacting with external libraries.
+
+2. **Updating:**
+   - The updating stage occurs when a component is re-rendered due to changes in its state or props.
+   - Key lifecycle methods during updating include:
+     - `render`: The component's UI is re-rendered to reflect the new state or props.
+     - `componentDidUpdate`: This method is called after the component has been updated in the DOM. It's commonly used for side effects or interactions based on the updated data.
+
+3. **Unmounting:**
+   - The unmounting stage occurs when a component is removed from the DOM.
+   - The primary lifecycle method for unmounting is:
+     - `componentWillUnmount`: This method is called just before the component is removed from the DOM. It's typically used for cleanup tasks, such as canceling network requests or removing event listeners.
+
+Understanding the React component lifecycle is essential for managing component behavior, handling side effects, and optimizing performance in your React applications. However, it's worth noting that with the introduction of React Hooks, some of the traditional class-based lifecycle methods, such as `componentDidMount` and `componentDidUpdate`, can be replaced by equivalent functionality using hooks like `useEffect`.
+
+## useEffect
+
+- `useEffect` is a React hook used for managing side effects in functional components. Side effects can include data fetching, DOM manipulation, subscriptions, and more.
+- It takes two arguments: a callback function and an optional dependency array.
+- If no dependency array is provided, the callback function will run on every render.
+- If a dependency array is provided, the callback function will run when the component mounts and whenever any of the dependencies in the array change.
+- The dependency array is crucial for ensuring that the effect runs when it should and doesn't run when it shouldn't. It should include all values that the callback function relies on and can change between renders.
+- The callback function can return a cleanup function, which will run before the main effect function runs again on unmount and before any re-renders.
+- Using `useEffect` allows us to manage side effects in a declarative and controlled way, making it easier to handle asynchronous operations and keep our component's behavior in sync with its rendering.
+- Let's explore the `useEffect` hook in React with an example where we'll create a simple React component that fetches data from an API when the component mounts.
+
+```javascript
+import React, { useState, useEffect } from 'react';
+
+function MyComponent() {
+  // State to store the fetched data
+  const [data, setData] = useState(null);
+
+  // useEffect for fetching data when the component mounts
+  useEffect(() => {
+    // Define the URL of the API
+    const apiUrl = 'https://jsonplaceholder.typicode.com/posts/1';
+
+    // Fetch data from the API using the Fetch API
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((result) => {
+        // Update the data state with the fetched data
+        setData(result);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []); // Empty dependency array means this effect runs only on mount
+
+  return (
+    <div>
+      <h1>Fetching Data Example</h1>
+      {data ? (
+        <div>
+          <h2>Title: {data.title}</h2>
+          <p>Body: {data.body}</p>
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
+  );
+}
+
+export default MyComponent;
+```
+
+In this example:
+
+1. We import the `useState` and `useEffect` hooks from React.
+
+2. Inside the `MyComponent` functional component, we declare a `data` state variable using `useState`. This state will be used to store the fetched data.
+
+3. We use the `useEffect` hook to define a side effect. This effect is responsible for fetching data from an API when the component mounts.
+
+4. Inside the `useEffect` callback function:
+   - We define the URL of the API we want to fetch data from.
+   - We use the `fetch` function to make the API request, parse the response as JSON, and update the `data` state with the fetched data.
+
+5. The empty dependency array `[]` as the second argument to `useEffect` ensures that the effect runs only once when the component mounts. If you were to provide dependencies in the array, the effect would run whenever any of those dependencies change.
+
+6. In the component's render function, we conditionally render the fetched data or a loading message based on the `data` state.
+
+- Consider another example where we'll use the `useEffect` hook to log messages when a state variable called `count` changes and when the component unmounts. The effect will run when the `count` variable changes.
+
+```javascript
+useEffect(() => {
+  console.log("count changed");
+
+  // Cleanup function (runs when the component unmounts or when `count` changes)
+  return () => {
+    console.log("cleanup count changed effect");
+  };
+}, [count]);
+```
+
+In this code:
+
+1. We're using the `useEffect` hook to define an effect that should run when the `count` state variable changes. We specify `[count]` as the dependency array, which means the effect runs whenever `count` changes.
+
+2. Inside the effect's callback function, we log the message `"count changed"` whenever the effect is triggered due to a change in the `count` state.
+
+3. Additionally, we return a cleanup function from the `useEffect`. The cleanup function is executed when the component unmounts or when the `count` variable changes.
+
+4. The cleanup function logs the message `"cleanup count changed effect"` to indicate that it's being executed when the effect is cleaned up.
+
+Here's how this code behaves:
+
+- When the component first mounts, the effect is triggered because `count` is considered changed from its initial state (if it started as `undefined` or `null`).
+
+- If `count` changes during the component's lifecycle, the effect runs again and logs `"count changed"` each time.
+
+- When the component unmounts or when `count` changes again, the cleanup function logs `"cleanup count changed effect"`.
+
+## useLayoutEffect
+
+- `useLayoutEffect` is a React hook used for performing side effects around the component lifecycle, similar to `useEffect`.
+- The primary difference between `useLayoutEffect` and `useEffect` is that `useLayoutEffect` runs synchronously, whereas `useEffect` runs asynchronously.
+- Because `useLayoutEffect` runs synchronously, it ensures that the effects it contains always finish running before the browser repaints the screen. This can be crucial when we need to make visual changes to the DOM that should be reflected immediately.
+- It's recommended to use `useLayoutEffect` only for effects that directly manipulate the DOM or require synchronous updates, as it may impact performance negatively if used unnecessarily.
+- When we don't need synchronous updates, we can generally prefer `useEffect` because it doesn't block the rendering pipeline and provides better performance for non-visual side effects.
+
+In summary, `useLayoutEffect` is a specialized hook for cases where we need synchronous, immediate updates to the DOM, but it should be used judiciously to avoid unnecessary performance overhead.
 
 ## References
 
@@ -183,6 +316,8 @@ return <input value={value} onChange={e => setValue(e.target.value)} />;
 - <https://react.dev/learn/state-a-components-memory>
 - <https://react.dev/reference/react/useState>
 - <https://react.dev/reference/react/useReducer>
+- <https://react.dev/reference/react/useEffect>
+- <https://react.dev/reference/react/useLayoutEffect>
 - <https://react.dev/learn/sharing-state-between-components#lifting-state-up-by-example>
 - <https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components>
 - <https://react-tutorial.app/app.html>
